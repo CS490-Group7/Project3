@@ -93,3 +93,4 @@ class ActivityUser(DB.Model):
 
     def __repr__(self):
         return '<ActivityUser %r>' % self.id
+        
