@@ -2,7 +2,8 @@ import React, {useState, useEffect } from 'react';
 import Activity from './Activity.js'
 import CreateActivity from './CreateActivity.js'
 import {useParams, useHistory} from "react-router-dom";
-import { tripIdApi,userApi,userBalanceApi, setUserPaidApi } from './api/api.js';
+//import { tripIdApi,userApi,userBalanceApi, setUserPaidApi,updateActivityApi } from './api/api.js';
+import { tripIdApi,userBalanceApi} from './api/api.js';
 import LandingPage from "./LandingPage";
 import './App.css';
 
@@ -21,7 +22,7 @@ function Trip(props)
     const [participants,setParticipants] = useState([]);
     const [activityIds, setActivityIds] = useState([]);
     const [balance, setBalance] = useState(0);
-    
+
 
     function handleErrors(data){
       if(data.success === false){
@@ -42,8 +43,10 @@ function Trip(props)
         setParticipants(data.participants);
         setActivityIds(data.activities);
         setJointCode(data.joinCode);
+
+        
     }
-    
+
     function refresh(){
         setIsLoading(!isLoading);
     }

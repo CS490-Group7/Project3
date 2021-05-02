@@ -162,7 +162,8 @@ def handle_user_info():
     trips = []
     for trip in current_user.trips:
         current_trip = models.Trip.query.filter_by(id=trip.trip_id).first()
-        trips.append({'trip_id': current_trip.id, 'name': current_trip.trip_name, 'startDate': current_trip.start_date, 'endDate': current_trip.end_date})
+        trips.append({'trip_id': current_trip.id, 'name': current_trip.trip_name, 'startDate':
+                      current_trip.start_date, 'endDate': current_trip.end_date})
     return {
         'success': True,
         'email': current_user.email,
@@ -222,7 +223,7 @@ def add_trip_to_database(trip_name, join_code, start_date, end_date, owner_id):
         a new trip to the database
     '''
     if len(join_code) == 7:
-        new_trip = models.Trip(trip_name=trip_name,start_date=start_date, end_date=end_date,
+        new_trip = models.Trip(trip_name=trip_name, start_date=start_date, end_date=end_date,
                                join_code=join_code,
                                owner_id=owner_id)
         DB.session.add(new_trip)
@@ -310,8 +311,8 @@ def handle_create_trip():
     if valid_trip is not None:
         return {'success': False, 'message': 'Join code already exists.'}, 200
     # Create Trip
-    add_trip_to_database(trip_data['trip_name'], trip_data['join_code'], trip_data['start_date'], trip_data['end_date'],
-                         current_user.id)
+    add_trip_to_database(trip_data['trip_name'], trip_data['join_code'],
+                         trip_data['start_date'], trip_data['end_date'], current_user.id)
     # Create TripUser
     new_trip_user = models.TripUser(trip_id=DB.session.query(
         func.max(models.Trip.id)),
@@ -542,7 +543,6 @@ def handle_create_activity():
     time = request.get_json()['time']
     if date and time is None or date == "" or time == "":
         return {'success': False, 'message': 'Invalid date or time.'}, 401
-        
     # Check if trip exists
     trip = models.Trip.query.filter_by(id=trip_id).first()
     if trip is not None:
@@ -670,7 +670,89 @@ def handle_mark_paid():
         'Error has occured while trying to mark the specified user as paid.'
     }, 401
 
+@APP.route('/api/activity/update', methods=['POST'])
+def handle_update_activity():
+    '''
+        Given a token ID, trip ID, and activity data, creates activity
+    '''
+    headers_status = verify_headers(request.headers)
+    if not headers_status['success']:
+        return headers_status, 401
+    token_status = verify_token_id(
+        request.headers['Authorization'].split(' ')[1])
+    if not token_status['success']:
+        return token_status, 401
 
+    current_user = token_status['user']
+    trip_id = request.get_json()['trip_id']
+    if trip_id == "" or trip_id is None:
+        return {'success': False, 'message': 'Invalid trip id.'}, 401
+
+    # Check for valid name and cost
+    activity_name = request.get_json()['activity_name']
+    cost = request.get_json()['activity_cost']
+    if activity_name == "" or activity_name is None or cost is None:
+        return {'success': False, 'message': 'Invalid details of trip.'}, 401
+
+    participants = request.get_json()['participants']
+    if participants is None:
+        return {
+            'success': False,
+            'message': 'Invalid list of participants.'
+        }, 401
+
+    # Check date and time
+    date = request.get_json()['date']
+    time = request.get_json()['time']
+    if date and time is None or date == "" or time == "":
+        return {'success': False, 'message': 'Invalid date or time.'}, 401
+    # Check if trip exists
+    trip = models.Trip.query.filter_by(id=trip_id).first()
+    if trip is not None:
+        # Check if user is in the trip
+        trip_user = models.TripUser.query.filter_by(
+            trip_id=trip.id, user_id=current_user.id).first()
+        if trip_user is not None:
+            valid_participants = []
+            # Check if participant list is valid
+            if len(participants) != 0:
+                for participant in participants:
+                    # Check if participant is a valid user
+                    current_participant = models.User.query.filter_by(
+                        email=str(participant)).first()
+                    if current_participant is None:
+                        return {
+                            'success': False,
+                            'message': 'Email of a participant is invalid.'
+                        }, 401
+                    valid_participants.append(current_participant)
+            # Create Activity using provided details
+            result = add_activity_to_database(trip.id, activity_name,
+                                              int(cost), date, time,
+                                              len(valid_participants) + 1,
+                                              current_user.id)
+
+            # Create database objects to link user to activity
+            if result:
+                # Add initial creator to activity user table
+                add_user_to_activity(result, current_user.id, 1)
+
+                for user in valid_participants:
+                    add_user_to_activity(result, user.id, 0)
+                return {
+                    'success': True,
+                    'message': 'Successfully created the activity.'
+                }, 200
+            return {
+                'success': False,
+                'message': 'Error creating the activity.'
+            }, 401
+        return {
+            'success': False,
+            'message':
+            'You are not authorized to create an activity on this trip.'
+        }, 401
+    return {'success': False, 'message': 'Invalid trip id.'}, 401
 
 # Note we need to add this line so we can import app in the python shell
 if __name__ == "__main__":
@@ -678,3 +760,4 @@ if __name__ == "__main__":
         host=os.getenv('IP', '0.0.0.0'),
         port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', "8081")),
     )
+    

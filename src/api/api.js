@@ -136,6 +136,18 @@ const createActivityApi = (tokenId, tripId, activityName, date, time, cost, part
     }).then(response => response.json());
 };
 
+const updateActivityApi = (tokenId, tripId, activityName, date, time, cost, participants) => {
+    const data = {'trip_id': tripId, 'activity_name': activityName, 'activity_cost': cost, 'date': date, 'time': time, 'participants': participants};
+    return fetch('/api/activity/update', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + tokenId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json());
+};
+
 
 export {
     loginApi,
@@ -149,5 +161,7 @@ export {
     createActivityApi,
     getActivityApi,
     setUserPaidApi,
-    userBalanceApi
+    userBalanceApi,
+    
+    updateActivityApi
 };

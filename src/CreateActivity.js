@@ -1,14 +1,13 @@
-import Login from './Login.js';
 import React, {useState, useEffect } from 'react';
 import './App.css';
 
 import { createActivityApi, tripIdApi } from './api/api.js';
 import {NotificationContainer} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
-import Popup from 'reactjs-popup';
+//import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
-import {InputEmails , getInvitedEmails} from './InputEmails'
-import {useParams, useHistory} from "react-router-dom";
+//import {InputEmails , getInvitedEmails} from './InputEmails'
+import {useParams} from "react-router-dom";
 
 
 
@@ -58,11 +57,6 @@ function CreateActivity(props){
 
     return (
       <div className="Activity">
-
-        <Popup trigger={<button> Add an Participant</button>} position="right center">
-          <div><InputEmails/> <getInvitedEmails/></div>
-          <button type="submit" onChange={e => setEmails(e.target.value)} onClick={onSubmit}>Submit</button>
-        </Popup>
 
         <NotificationContainer/>
             <div className="box">

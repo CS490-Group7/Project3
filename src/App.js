@@ -10,10 +10,10 @@ import CreateTrip from './CreateTrip';
 import Trip from './Trip';
 import 'react-notifications/lib/notifications.css';
 import LandingPage from './LandingPage';
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import { NotificationManager} from 'react-notifications';
 
 
-import {BrowserRouter as Router, HashRouter, Switch,Route} from "react-router-dom";
+import { HashRouter, Switch,Route} from "react-router-dom";
 // removed props from App()
 function App() {
     const [isAuthenticated, setAuth] = useState(false);
