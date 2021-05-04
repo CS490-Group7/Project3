@@ -15,11 +15,14 @@ function HomePage(props){
     const [trips, setTrips] = useState([]);
     const [hide, setHide]=useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    //const PexelsAPI = require('pexels-api-wrapper');
     // const monthNames = ["January", "February", "March", "April", "May", "June",
     // "July", "August", "September", "October", "November", "December"
     // ];
-    
+
     function randomImages(){
+     
       var images = ["https://i.stack.imgur.com/CJT47.jpg","https://www.freegreatpicture.com/files/85/2994-man-and-nature.jpg"
                     ,"https://www.freegreatpicture.com/files/31/10971-world-scenery.jpg"
                     ,"https://media.cntraveler.com/photos/5949abf42bd0d42819c6065e/master/pass/Big-Bend-GettyImages-516259396.jpg"
@@ -78,7 +81,7 @@ function HomePage(props){
   
   if(isViewable){
     return (
-      <div className="homePage">
+      <div className="homePage ">
       
       <NotificationContainer/>
         <h2>Hello, {firstName}!</h2>

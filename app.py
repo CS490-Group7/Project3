@@ -162,14 +162,12 @@ def handle_user_info():
     trips = []
     for trip in current_user.trips:
         current_trip = models.Trip.query.filter_by(id=trip.trip_id).first()
-
         trips.append({
             'trip_id': current_trip.id,
             'name': current_trip.trip_name,
             'startDate': current_trip.start_date,
             'endDate': current_trip.end_date
         })
-
     return {
         'success': True,
         'email': current_user.email,
@@ -229,11 +227,9 @@ def add_trip_to_database(trip_name, join_code, start_date, end_date, owner_id):
         a new trip to the database
     '''
     if len(join_code) == 7:
-
         new_trip = models.Trip(trip_name=trip_name,
                                start_date=start_date,
                                end_date=end_date,
-
                                join_code=join_code,
                                owner_id=owner_id)
         DB.session.add(new_trip)
@@ -322,10 +318,8 @@ def handle_create_trip():
         return {'success': False, 'message': 'Join code already exists.'}, 200
     # Create Trip
     add_trip_to_database(trip_data['trip_name'], trip_data['join_code'],
-
                          trip_data['start_date'], trip_data['end_date'],
                          current_user.id)
-
     # Create TripUser
     new_trip_user = models.TripUser(trip_id=DB.session.query(
         func.max(models.Trip.id)),
@@ -805,7 +799,6 @@ def handle_remove_user():
         'success': True,
         'message': 'Successfully removed user from the activity.'
     }, 200
-
 
 
 # Note we need to add this line so we can import app in the python shell

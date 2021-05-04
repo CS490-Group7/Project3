@@ -16,9 +16,9 @@ function Nav(props) {
     }, [props.isAuth, props.token]);
     
     return(
-    <nav className='navbar navbar-expand-md navStyle'>
+    <nav className='navbar navbar-expand-md navStyle '>
        <h1 className='topic'>STIPEND ... <h6 className="subheading"> Trips Made Easier</h6></h1>
-        <button className="navbar-toggler" type="button" 
+        <button className="navbar-toggler back" type="button" 
             data-toggle="collapse"
             data-target="#navbarSupportedContent" 
             aria-controls="navbarSupportedContent" 
@@ -26,7 +26,7 @@ function Nav(props) {
             aria-label="Toggle navigation">
          <i className="fas fa-align-justify fa-2x" />
         </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <div className="collapse navbar-collapse " id="navbarSupportedContent">
             <ul className="nav navbar-nav ml-auto" >
             <div>
                 {props.isAuth?
