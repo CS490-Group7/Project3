@@ -99,13 +99,13 @@ function HomePage(props){
         
             <div className="col">
               <a href={`/#/trip/${trip.trip_id}`}>
-                <img className="images" alt="" src={randomImages() }/>
-                <span className="align-middle">{trip.name} - {trip.startDate} to {trip.endDate}</span>
+                <img className="images" src={randomImages()}/>
+                <span className="align-middle">{trip.name}<br/> {trip.startDate}<br/> to<br/> {trip.endDate}</span>
                 <div>
                   
                 </div>
               </a>
-              <button type="submit" onClick={()=>deleteTrip(trip.trip_id)}>Delete</button>
+              <button className="tripDelete" type="submit" onClick={()=>deleteTrip(trip.trip_id)}>Delete</button>
               </div>
             </div>
        
