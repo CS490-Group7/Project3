@@ -335,7 +335,8 @@ def handle_create_trip():
 def invite_to_trip():
     '''
         Given a token ID, list of emails, and join code, will invite all emails
-        to the trip associated with the join code
+        to the trip associated with the join code. Will set invited emails as
+        invited users.
     '''
     headers_status = verify_headers(request.headers)
     if not headers_status['success']:
@@ -347,9 +348,33 @@ def invite_to_trip():
     current_user = token_status['user']
     invited_emails = request.get_json()['invited_emails']
     join_code = request.get_json()['join_code']
+    trip_invite_status = create_invited_users_in_database(join_code, invited_emails)
+    if not trip_invite_status['success']:
+        return trip_invite_status, 401
     send_invites(current_user.first_name + ' ' + current_user.last_name,
                  invited_emails, join_code)
-    return {'success': True, 'message': 'Successfully invited.'}
+    return {'success': True, 'message': 'Successfully invited.'}, 200
+
+
+def create_invited_users_in_database(join_code, invited_emails):
+    '''
+        Given a join code and a list of invited emails, creates
+        an InvitedUser for the email if not already invited.
+    '''
+    trip = models.Trip.query.filter_by(join_code=join_code).first()
+    if trip is None:
+        return {'success': False, 'message': 'Could not find trip with that join code.'}
+    invited_users = list(map(lambda x: x.email, trip.invited))
+    added_user = False
+    for email in invited_emails:
+        if email not in invited_users:
+            new_invited_user = models.InvitedUser(trip_id=trip.id, email=email)
+            DB.session.add(new_invited_user)
+            added_user = True
+    if added_user:
+        DB.session.commit()
+        return {'success': True}
+    return {'success': False, 'message': 'Already invited every email.'}
 
 
 @APP.route('/api/trip/join', methods=['POST'])
@@ -376,6 +401,10 @@ def handle_join_trip():
             trip_id=trip.id, user_id=current_user.id).first()
         # Check if user is already in the trip
         if trip_user is None:
+            #Check if user was invited to the trip
+            user_invited_status = check_if_user_invited(trip.id, current_user.email)
+            if not user_invited_status['success']:
+                return user_invited_status, 401
             new_trip_user = models.TripUser(trip_id=trip.id,
                                             user_id=current_user.id)
             DB.session.add(new_trip_user)
@@ -390,6 +419,18 @@ def handle_join_trip():
             'message': 'You have already joined this trip.'
         }, 401
     return {'success': False, 'message': 'Invalid join code.'}, 401
+
+
+def check_if_user_invited(trip_id, email):
+    '''
+        Given a trip id and email, checks
+        if the user was invited to the trip.
+    '''
+    invited_user = models.InvitedUser.query.filter_by(
+        trip_id=trip_id, email=email).first()
+    if invited_user is None:
+        return {'success': False, 'message': 'You are not invited to this trip'}
+    return {'success': True}
 
 
 @APP.route('/api/trip/delete', methods=['DELETE'])

@@ -47,7 +47,7 @@ class InvitedUser(DB.Model):
     ''' InvitedUser model '''
     id = DB.Column(DB.Integer, primary_key=True)
     trip_id = DB.Column(DB.Integer, DB.ForeignKey('trip.id'), nullable=False)
-    email = DB.Column(DB.String(254), unique=True, nullable=False)
+    email = DB.Column(DB.String(254), nullable=False)
 
     def __repr__(self):
         return '<InvitedUser %r>' % self.id
