@@ -38,10 +38,19 @@ class Trip(DB.Model):
     owner_id = DB.Column(DB.Integer, DB.ForeignKey('user.id'), nullable=False)
     users = DB.relationship('TripUser', backref='trip', lazy=True)
     activities = DB.relationship('Activity', backref='trip', lazy=True)
+    invited = DB.relationship('InvitedUser', backref='trip', lazy=True)
 
     def __repr__(self):
         return '<Trip %r>' % self.id
 
+class InvitedUser(DB.Model):
+    ''' InvitedUser model '''
+    id = DB.Column(DB.Integer, primary_key=True)
+    trip_id = DB.Column(DB.Integer, DB.ForeignKey('trip.id'), nullable=False)
+    email = DB.Column(DB.String(254), unique=True, nullable=False)
+    
+    def __repr__(self):
+        return '<InvitedUser %r>' % self.id
 
 class TripUser(DB.Model):
     ''' TripUser model '''
