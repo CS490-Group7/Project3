@@ -365,6 +365,7 @@ def create_invited_users_in_database(join_code, invited_emails):
     if trip is None:
         return {'success': False, 'message': 'Could not find trip with that join code.'}
     invited_users = list(map(lambda x: x.email, trip.invited))
+    print(invited_users)
     added_user = False
     for email in invited_emails:
         if email not in invited_users:
